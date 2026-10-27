@@ -3,8 +3,17 @@ import json
 import os
 from pathlib import Path
 from mcp.server.fastmcp import FastMCP
+from mcp.server.transport_security import TransportSecuritySettings
 
-app = FastMCP("Solvero DistroKid")
+PUBLIC_HOST = os.environ.get("SOLVERO_PUBLIC_HOST", "solvero-distrokid-mcp.onrender.com")
+app = FastMCP(
+    "Solvero DistroKid",
+    transport_security=TransportSecuritySettings(
+        enable_dns_rebinding_protection=True,
+        allowed_hosts=[PUBLIC_HOST, f"{PUBLIC_HOST}:*", "localhost:*", "127.0.0.1:*"],
+        allowed_origins=["https://chatgpt.com"],
+    ),
+)
 DATA_DIR = Path(os.environ.get("SOLVERO_DATA_DIR", "./data")).resolve()
 
 def validate(title: str, artist: str, audio_path: str, cover_path: str) -> dict:
